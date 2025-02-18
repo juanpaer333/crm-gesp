@@ -8,12 +8,10 @@ import {
   Users,
   Calendar,
   DollarSign,
-  LogOut,
-  Shield
+  LogOut
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/auth-context";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean;
@@ -22,7 +20,6 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
   const [location] = useLocation();
   const { toast } = useToast();
-  const { isAdmin } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -40,11 +37,6 @@ export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
   };
 
   const items = [
-    ...(isAdmin ? [{
-      title: "Admin",
-      icon: Shield,
-      href: "/admin"
-    }] : []),
     {
       title: "Dashboard",
       icon: LayoutDashboard,
