@@ -42,7 +42,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const docSnap = await getDoc(userRef);
 
           if (docSnap.exists()) {
-            const data = docSnap.data() as UserData;
+            // Map Spanish field names to English
+            const firestoreData = docSnap.data();
+            const data: UserData = {
+              admin: firestoreData.admin ?? false,
+              email: firestoreData.email ?? user.email ?? '',
+              name: firestoreData.nombre ?? user.displayName ?? '',  // Map 'nombre' to 'name'
+              paid: firestoreData.pagado ?? false,  // Map 'pagado' to 'paid'
+              uid: user.uid
+            };
+
             console.log("User data loaded:", { 
               admin: data.admin, 
               email: data.email,
@@ -50,8 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
             setUserData(data);
           } else {
-            console.log("No user document found, creating one for:", user.uid);
-            // Create a default user document if it doesn't exist
+            console.log("No user document found, using Firestore document");
+            // Don't create a new document, as it should already exist
             const defaultUserData: UserData = {
               admin: false,
               email: user.email || '',
@@ -59,14 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               paid: false,
               uid: user.uid
             };
-
-            try {
-              await setDoc(userRef, defaultUserData);
-              console.log("Created default user document");
-              setUserData(defaultUserData);
-            } catch (error) {
-              console.error("Error creating user document:", error);
-            }
+            setUserData(defaultUserData);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);

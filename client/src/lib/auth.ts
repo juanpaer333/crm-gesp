@@ -12,21 +12,15 @@ export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(auth, googleProvider);
 
-    // After successful Google sign-in, create/update user document
+    // After successful Google sign-in, check existing user document
     const userRef = doc(db, 'users', result.user.uid);
     const docSnap = await getDoc(userRef);
 
+    // We don't create a new document if it exists, as it should be managed in Firebase Console
     if (!docSnap.exists()) {
-      // Create new user document
-      const userData = {
-        email: result.user.email,
-        name: result.user.displayName,
-        admin: result.user.email === "juanpabbloer@gmail.com", // Make this specific email admin
-        paid: false,
-        uid: result.user.uid
-      };
-      await setDoc(userRef, userData);
-      console.log("Created new user document for:", result.user.email, "with admin:", userData.admin);
+      console.log("Warning: No user document found in Firestore for:", result.user.email);
+    } else {
+      console.log("Found existing user document with admin status:", docSnap.data().admin);
     }
 
     return result.user;
