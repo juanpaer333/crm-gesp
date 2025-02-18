@@ -4,13 +4,13 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  getProperties(): Promise<Property[]>;
+  getProperties(userId: number): Promise<Property[]>;
   createProperty(property: InsertProperty): Promise<Property>;
-  getClients(): Promise<Client[]>;
+  getClients(userId: number): Promise<Client[]>;
   createClient(client: InsertClient): Promise<Client>;
-  getAppointments(): Promise<Appointment[]>;
+  getAppointments(userId: number): Promise<Appointment[]>;
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
-  getSales(): Promise<Sale[]>;
+  getSales(userId: number): Promise<Sale[]>;
   createSale(sale: InsertSale): Promise<Sale>;
 }
 
@@ -52,8 +52,10 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async getProperties(): Promise<Property[]> {
-    return Array.from(this.properties.values());
+  async getProperties(userId: number): Promise<Property[]> {
+    return Array.from(this.properties.values()).filter(
+      (property) => property.userId === userId
+    );
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
@@ -63,8 +65,10 @@ export class MemStorage implements IStorage {
     return newProperty;
   }
 
-  async getClients(): Promise<Client[]> {
-    return Array.from(this.clients.values());
+  async getClients(userId: number): Promise<Client[]> {
+    return Array.from(this.clients.values()).filter(
+      (client) => client.userId === userId
+    );
   }
 
   async createClient(client: InsertClient): Promise<Client> {
@@ -74,8 +78,10 @@ export class MemStorage implements IStorage {
     return newClient;
   }
 
-  async getAppointments(): Promise<Appointment[]> {
-    return Array.from(this.appointments.values());
+  async getAppointments(userId: number): Promise<Appointment[]> {
+    return Array.from(this.appointments.values()).filter(
+      (appointment) => appointment.userId === userId
+    );
   }
 
   async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
@@ -85,8 +91,10 @@ export class MemStorage implements IStorage {
     return newAppointment;
   }
 
-  async getSales(): Promise<Sale[]> {
-    return Array.from(this.sales.values());
+  async getSales(userId: number): Promise<Sale[]> {
+    return Array.from(this.sales.values()).filter(
+      (sale) => sale.userId === userId
+    );
   }
 
   async createSale(sale: InsertSale): Promise<Sale> {

@@ -12,6 +12,7 @@ export const users = pgTable("users", {
 
 export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
@@ -25,6 +26,7 @@ export const properties = pgTable("properties", {
 
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),
@@ -37,6 +39,7 @@ export const clients = pgTable("clients", {
 
 export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
   clientId: integer("client_id").notNull(),
   propertyId: integer("property_id").notNull(),
   date: timestamp("date").notNull(),
@@ -47,6 +50,7 @@ export const appointments = pgTable("appointments", {
 
 export const sales = pgTable("sales", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
   propertyId: integer("property_id").notNull(),
   clientId: integer("client_id").notNull(),
   amount: integer("amount").notNull(),
