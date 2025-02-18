@@ -25,6 +25,11 @@ export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
   const { toast } = useToast();
   const { userData } = useAuth();
 
+  console.log("Sidebar - User Data:", {
+    isAdmin: userData?.admin,
+    email: userData?.email
+  });
+
   const handleSignOut = async () => {
     try {
       await signOut();
