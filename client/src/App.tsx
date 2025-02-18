@@ -11,10 +11,11 @@ import PropertiesPage from "./pages/properties/page";
 import ClientsPage from "./pages/clients/page";
 import AppointmentsPage from "./pages/appointments/page";
 import SalesPage from "./pages/sales/page";
+import AdminUsersPage from "./pages/admin/users";
 import NotFound from "./pages/not-found";
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+function PrivateRoute({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) {
+  const { user, userData, loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -22,6 +23,10 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Redirect to="/login" />;
+  }
+
+  if (adminOnly && !userData?.admin) {
+    return <Redirect to="/dashboard" />;
   }
 
   return <DashboardShell>{children}</DashboardShell>;
@@ -63,6 +68,13 @@ function Router() {
       <Route path="/sales">
         <PrivateRoute>
           <SalesPage />
+        </PrivateRoute>
+      </Route>
+
+      {/* Admin Routes */}
+      <Route path="/admin/users">
+        <PrivateRoute adminOnly>
+          <AdminUsersPage />
         </PrivateRoute>
       </Route>
 

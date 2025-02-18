@@ -8,10 +8,13 @@ import {
   Users,
   Calendar,
   DollarSign,
-  LogOut
+  Settings,
+  LogOut,
+  UserCog
 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean;
@@ -20,6 +23,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { userData } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -64,6 +68,15 @@ export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
     }
   ];
 
+  // Admin-only menu items
+  const adminItems = [
+    {
+      title: "User Management",
+      icon: UserCog,
+      href: "/admin/users"
+    }
+  ];
+
   return (
     <div className={cn("flex flex-col h-screen", className)}>
       <ScrollArea className="flex-1">
@@ -82,6 +95,35 @@ export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
               </Button>
             </Link>
           ))}
+
+          {/* Show admin items only for admin users */}
+          {userData?.admin && (
+            <>
+              <div className="my-2">
+                <div className="px-3 py-2">
+                  {!isCollapsed && (
+                    <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+                      Admin
+                    </h2>
+                  )}
+                </div>
+                {adminItems.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant={location === item.href ? "secondary" : "ghost"}
+                      className={cn(
+                        "w-full justify-start",
+                        isCollapsed && "justify-center"
+                      )}
+                    >
+                      <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                      {!isCollapsed && item.title}
+                    </Button>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </ScrollArea>
       <Button
