@@ -2,80 +2,46 @@ import { Switch, Route, Redirect } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider, useAuth } from "./contexts/auth-context";
 import { DashboardShell } from "./components/layout/dashboard-shell";
 
-import LoginPage from "./pages/auth/login";
 import DashboardPage from "./pages/dashboard/page";
 import PropertiesPage from "./pages/properties/page";
 import ClientsPage from "./pages/clients/page";
 import AppointmentsPage from "./pages/appointments/page";
 import SalesPage from "./pages/sales/page";
-import AdminUsersPage from "./pages/admin/users";
 import NotFound from "./pages/not-found";
 
-function PrivateRoute({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) {
-  const { user, userData, loading } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <Redirect to="/login" />;
-  }
-
-  if (adminOnly && !userData?.admin) {
-    return <Redirect to="/dashboard" />;
-  }
-
-  return <DashboardShell>{children}</DashboardShell>;
-}
-
 function Router() {
-  const { user } = useAuth();
-
   return (
     <Switch>
-      <Route path="/login">
-        {user ? <Redirect to="/dashboard" /> : <LoginPage />}
-      </Route>
-
       <Route path="/dashboard">
-        <PrivateRoute>
+        <DashboardShell>
           <DashboardPage />
-        </PrivateRoute>
+        </DashboardShell>
       </Route>
 
       <Route path="/properties">
-        <PrivateRoute>
+        <DashboardShell>
           <PropertiesPage />
-        </PrivateRoute>
+        </DashboardShell>
       </Route>
 
       <Route path="/clients">
-        <PrivateRoute>
+        <DashboardShell>
           <ClientsPage />
-        </PrivateRoute>
+        </DashboardShell>
       </Route>
 
       <Route path="/appointments">
-        <PrivateRoute>
+        <DashboardShell>
           <AppointmentsPage />
-        </PrivateRoute>
+        </DashboardShell>
       </Route>
 
       <Route path="/sales">
-        <PrivateRoute>
+        <DashboardShell>
           <SalesPage />
-        </PrivateRoute>
-      </Route>
-
-      {/* Admin Routes */}
-      <Route path="/admin/users">
-        <PrivateRoute adminOnly>
-          <AdminUsersPage />
-        </PrivateRoute>
+        </DashboardShell>
       </Route>
 
       <Route path="/">
@@ -92,10 +58,8 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
+      <Router />
+      <Toaster />
     </QueryClientProvider>
   );
 }
