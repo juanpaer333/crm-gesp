@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmail, signInWithGoogle } from "@/lib/auth";
+import { signInWithEmail, signInWithGoogle, signOut } from "@/lib/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,6 +28,8 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
+      // First sign out to ensure we get a fresh login
+      await signOut();
       await signInWithGoogle();
       setLocation("/dashboard");
     } catch (error) {
@@ -65,7 +67,7 @@ export default function LoginPage() {
               Sign in with Email
             </Button>
           </form>
-          
+
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />

@@ -1,4 +1,4 @@
-import { auth, googleProvider } from "./firebase";
+import { auth, googleProvider, db } from "./firebase";
 import { 
   signInWithEmailAndPassword, 
   signInWithPopup,
@@ -6,10 +6,29 @@ import {
   signOut as firebaseSignOut,
   User
 } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export async function signInWithGoogle() {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+
+    // After successful Google sign-in, create/update user document
+    const userRef = doc(db, 'users', result.user.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (!docSnap.exists()) {
+      // Create new user document
+      const userData = {
+        email: result.user.email,
+        name: result.user.displayName,
+        admin: result.user.email === "juanpabbloer@gmail.com", // Make this specific email admin
+        paid: false,
+        uid: result.user.uid
+      };
+      await setDoc(userRef, userData);
+      console.log("Created new user document for:", result.user.email, "with admin:", userData.admin);
+    }
+
     return result.user;
   } catch (error) {
     console.error("Error signing in with Google:", error);
