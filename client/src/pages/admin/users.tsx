@@ -31,8 +31,11 @@ export default function AdminUsersPage() {
   const { userData } = useAuth();
   const [, setLocation] = useLocation();
 
+  console.log("Admin page - Current user data:", userData);
+
   // Redirect if not admin
   if (userData && !userData.admin) {
+    console.log("Non-admin user attempting to access admin page");
     setLocation("/dashboard");
     return null;
   }
@@ -40,12 +43,14 @@ export default function AdminUsersPage() {
   const { data: users, isLoading } = useQuery({
     queryKey: ["/admin/users"],
     queryFn: async () => {
+      console.log("Fetching users from Firestore");
       const usersCollection = collection(db, "users");
       const snapshot = await getDocs(usersCollection);
       const users: FirebaseUser[] = [];
       snapshot.forEach((doc) => {
         users.push({ uid: doc.id, ...doc.data() } as FirebaseUser);
       });
+      console.log("Fetched users:", users.length);
       return users;
     },
   });

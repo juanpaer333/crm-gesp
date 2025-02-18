@@ -31,18 +31,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      console.log("Auth state changed:", user?.email);
       setUser(user);
 
       if (user) {
         // Fetch additional user data from Firestore
         const userRef = doc(db, 'users', user.uid);
         try {
+          console.log("Fetching user data for:", user.uid);
           const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
-            setUserData(docSnap.data() as UserData);
+            const data = docSnap.data() as UserData;
+            console.log("User data loaded:", { 
+              admin: data.admin, 
+              email: data.email,
+              paid: data.paid 
+            });
+            setUserData(data);
+          } else {
+            console.log("No user document found for:", user.uid);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
+          // Create a default user document if it doesn't exist
+          const defaultUserData: UserData = {
+            admin: false,
+            email: user.email || '',
+            name: user.displayName || '',
+            paid: false,
+            uid: user.uid
+          };
+          setUserData(defaultUserData);
         }
       } else {
         setUserData(null);
