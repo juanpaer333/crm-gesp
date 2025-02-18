@@ -1,0 +1,67 @@
+Quiero que desarrolles una aplicación web completa en Next.js 14 con App Router, Firebase Firestore como base de datos y Tailwind CSS para los estilos.
+
+La aplicación es un CRM Inmobiliario para gestionar propiedades, clientes, citas y ventas. Debe ser totalmente funcional, con autenticación de usuarios y una interfaz minimalista y fluida.
+
+🔹 Tecnologías Requeridas:
+Frontend: Next.js 14 con App Router
+Estilos: Tailwind CSS con diseño oscuro y minimalista
+Base de Datos: Firebase Firestore
+Autenticación: Firebase Auth (Email/Contraseña y Google)
+Estado Global: React Context o Zustand
+Navegación: Sidebar oculta con botón hamburguesa
+Gráficos: Librería como Chart.js o Recharts
+📂 Estructura del Proyecto
+📁 crm-inmobiliario/ (Carpeta raíz del proyecto)
+│
+├── 📁 src/app/ (Código principal de la aplicación)
+│ ├── 📁 citas/ (Gestión de citas con clientes)
+│ │ ├── nueva.js (Crear nueva cita)
+│ │ ├── page.js (Lista de citas programadas)
+│ │
+│ ├── 📁 clientes/ (Gestión de clientes inmobiliarios)
+│ │ ├── detalle.js (Perfil detallado del cliente)
+│ │ ├── page.js (Lista de clientes con filtros)
+│ │
+│ ├── 📁 components/ (Componentes reutilizables)
+│ │ ├── Header.js (Encabezado con usuario y logout)
+│ │ ├── Sidebar.js (Menú lateral con navegación del CRM)
+│ │ ├── PropertyCard.js (Tarjeta de propiedad con detalles)
+│ │ ├── ClientCard.js (Tarjeta de cliente con información relevante)
+│ │
+│ ├── 📁 dashboard/ (Panel de métricas y estadísticas)
+│ │ ├── page.js (Vista con gráficos y KPIs)
+│ │
+│ ├── 📁 propiedades/ (Gestión de propiedades inmobiliarias)
+│ │ ├── add.js (Formulario para agregar propiedad)
+│ │ ├── edit.js (Formulario para editar propiedad)
+│ │ ├── page.js (Lista de propiedades con filtros)
+│ │
+│ ├── 📁 ventas/ (Gestión de ventas y contratos)
+│ │ ├── contrato.js (Detalles de contratos de venta/renta)
+│ │ ├── page.js (Historial de ventas y pagos)
+│ │
+│ ├── layout.js (Estructura global con Sidebar y Header)
+│ ├── page.js (Pantalla principal del CRM con resumen rápido)
+│ ├── globals.css (Estilos globales con Tailwind)
+│
+├── 📁 lib/ (Lógica de autenticación y base de datos)
+│ ├── auth.js (Manejo de login, logout y Google Sign-In)
+│ ├── useAuth.js (Hook para gestionar el estado del usuario autenticado)
+│ ├── firebaseConfig.js (Configuración de Firebase Firestore y Auth)
+│ ├── database.js (Funciones CRUD para propiedades, clientes y ventas)
+│
+├── 📄 package.json (Dependencias y scripts del proyecto)
+├── 📄 tailwind.config.js (Configuración de estilos con Tailwind)
+├── 📄 next.config.mjs (Configuración de Next.js)
+├── 📄 README.md (Documentación del proyecto)
+
+🎯 Requisitos Funcionales:
+Autenticación Segura: Login con correo/contraseña y Google.
+Gestión de Propiedades: CRUD completo con filtros avanzados.
+Gestión de Clientes: CRUD completo con historial y seguimiento.
+Agendamiento de Citas: Crear y visualizar citas con clientes.
+Manejo de Ventas y Contratos: Registro y administración de pagos y contratos.
+Dashboard con Gráficos: Mostrar KPIs de ventas, propiedades disponibles y clientes activos.
+Sidebar Oculto: Desplegable con botón de hamburguesa.
+Modo Oscuro y Minimalista: Estética limpia y fluida.
+🎯 Objetivo: Que la IA genere el código completo con Next.js, Firebase y Tailwind, listo para ejecutar y probar.
