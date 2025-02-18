@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 interface AuthContextType {
   user: User | null;
@@ -23,9 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
       if (user) {
-        // TODO: Fetch user data from backend to check admin status
-        // For now, we'll set admin status if email matches
-        setIsAdmin(user.email === "admin@example.com");
+        // Check admin status in Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        setIsAdmin(userDoc.data()?.isAdmin || false);
       } else {
         setIsAdmin(false);
       }

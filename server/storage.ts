@@ -1,4 +1,6 @@
 import { users, type User, type InsertUser, type Property, type InsertProperty, type Client, type InsertClient, type Appointment, type InsertAppointment, type Sale, type InsertSale } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -32,160 +34,98 @@ export interface IStorage {
   createSale(sale: InsertSale): Promise<Sale>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private properties: Map<number, Property>;
-  private clients: Map<number, Client>;
-  private appointments: Map<number, Appointment>;
-  private sales: Map<number, Sale>;
-  private currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.properties = new Map();
-    this.clients = new Map();
-    this.appointments = new Map();
-    this.sales = new Map();
-    this.currentId = 1;
-  }
-
-  private getNextId(): number {
-    return this.currentId++;
-  }
-
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByFirebaseId(firebaseUid: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.firebaseUid === firebaseUid
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.getNextId();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
+  async getUserByFirebaseId(firebaseUid: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.firebaseUid, firebaseUid));
+    return user;
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const [newUser] = await db.insert(users).values(user).returning();
+    return newUser;
+  }
+
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
 
   // Properties methods
   async getProperties(userId: number): Promise<Property[]> {
-    return Array.from(this.properties.values()).filter(
-      (property) => property.userId === userId
-    );
+    return await db.select().from(properties).where(eq(properties.userId, userId));
   }
 
   async getAllProperties(): Promise<Property[]> {
-    return Array.from(this.properties.values());
+    return await db.select().from(properties);
   }
 
   async getPropertiesByUser(userId: number): Promise<Property[]> {
-    return Array.from(this.properties.values()).filter(
-      (property) => property.userId === userId
-    );
+    return await db.select().from(properties).where(eq(properties.userId, userId));
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const id = this.getNextId();
-    const newProperty: Property = { 
-      ...property, 
-      id,
-      createdAt: new Date()
-    };
-    this.properties.set(id, newProperty);
+    const [newProperty] = await db.insert(properties).values(property).returning();
     return newProperty;
   }
 
   // Clients methods
   async getClients(userId: number): Promise<Client[]> {
-    return Array.from(this.clients.values()).filter(
-      (client) => client.userId === userId
-    );
+    return await db.select().from(clients).where(eq(clients.userId, userId));
   }
 
   async getAllClients(): Promise<Client[]> {
-    return Array.from(this.clients.values());
+    return await db.select().from(clients);
   }
 
   async getClientsByUser(userId: number): Promise<Client[]> {
-    return Array.from(this.clients.values()).filter(
-      (client) => client.userId === userId
-    );
+    return await db.select().from(clients).where(eq(clients.userId, userId));
   }
 
   async createClient(client: InsertClient): Promise<Client> {
-    const id = this.getNextId();
-    const newClient: Client = {
-      ...client,
-      id,
-      createdAt: new Date()
-    };
-    this.clients.set(id, newClient);
+    const [newClient] = await db.insert(clients).values(client).returning();
     return newClient;
   }
 
   // Appointments methods
   async getAppointments(userId: number): Promise<Appointment[]> {
-    return Array.from(this.appointments.values()).filter(
-      (appointment) => appointment.userId === userId
-    );
+    return await db.select().from(appointments).where(eq(appointments.userId, userId));
   }
 
   async getAllAppointments(): Promise<Appointment[]> {
-    return Array.from(this.appointments.values());
+    return await db.select().from(appointments);
   }
 
   async getAppointmentsByUser(userId: number): Promise<Appointment[]> {
-    return Array.from(this.appointments.values()).filter(
-      (appointment) => appointment.userId === userId
-    );
+    return await db.select().from(appointments).where(eq(appointments.userId, userId));
   }
 
   async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
-    const id = this.getNextId();
-    const newAppointment: Appointment = {
-      ...appointment,
-      id,
-      createdAt: new Date()
-    };
-    this.appointments.set(id, newAppointment);
+    const [newAppointment] = await db.insert(appointments).values(appointment).returning();
     return newAppointment;
   }
 
   // Sales methods
   async getSales(userId: number): Promise<Sale[]> {
-    return Array.from(this.sales.values()).filter(
-      (sale) => sale.userId === userId
-    );
+    return await db.select().from(sales).where(eq(sales.userId, userId));
   }
 
   async getAllSales(): Promise<Sale[]> {
-    return Array.from(this.sales.values());
+    return await db.select().from(sales);
   }
 
   async getSalesByUser(userId: number): Promise<Sale[]> {
-    return Array.from(this.sales.values()).filter(
-      (sale) => sale.userId === userId
-    );
+    return await db.select().from(sales).where(eq(sales.userId, userId));
   }
 
   async createSale(sale: InsertSale): Promise<Sale> {
-    const id = this.getNextId();
-    const newSale: Sale = {
-      ...sale,
-      id,
-      createdAt: new Date()
-    };
-    this.sales.set(id, newSale);
+    const [newSale] = await db.insert(sales).values(sale).returning();
     return newSale;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
