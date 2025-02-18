@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface UserData {
@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           console.log("Fetching user data for:", user.uid);
           const docSnap = await getDoc(userRef);
+
           if (docSnap.exists()) {
             const data = docSnap.data() as UserData;
             console.log("User data loaded:", { 
@@ -49,11 +50,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
             setUserData(data);
           } else {
-            console.log("No user document found for:", user.uid);
+            console.log("No user document found, creating one for:", user.uid);
+            // Create a default user document if it doesn't exist
+            const defaultUserData: UserData = {
+              admin: false,
+              email: user.email || '',
+              name: user.displayName || '',
+              paid: false,
+              uid: user.uid
+            };
+
+            try {
+              await setDoc(userRef, defaultUserData);
+              console.log("Created default user document");
+              setUserData(defaultUserData);
+            } catch (error) {
+              console.error("Error creating user document:", error);
+            }
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          // Create a default user document if it doesn't exist
+          // If there's an error (like permission denied), still set default data
           const defaultUserData: UserData = {
             admin: false,
             email: user.email || '',
