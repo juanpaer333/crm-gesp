@@ -7,7 +7,8 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   photoUrl: text("photo_url"),
-  firebaseUid: text("firebase_uid").notNull().unique()
+  firebaseUid: text("firebase_uid").notNull().unique(),
+  isAdmin: boolean("is_admin").notNull().default(false)
 });
 
 export const properties = pgTable("properties", {
@@ -21,7 +22,7 @@ export const properties = pgTable("properties", {
   bathrooms: integer("bathrooms").notNull(),
   area: integer("area").notNull(),
   status: text("status").notNull(), // available, sold, rented
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 export const clients = pgTable("clients", {
@@ -34,7 +35,7 @@ export const clients = pgTable("clients", {
   propertyType: text("property_type"), // apartment, house, commercial
   status: text("status").notNull(), // active, inactive
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 export const appointments = pgTable("appointments", {
@@ -45,7 +46,7 @@ export const appointments = pgTable("appointments", {
   date: timestamp("date").notNull(),
   status: text("status").notNull(), // scheduled, completed, cancelled
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 export const sales = pgTable("sales", {
@@ -57,15 +58,15 @@ export const sales = pgTable("sales", {
   date: timestamp("date").notNull(),
   status: text("status").notNull(), // pending, completed, cancelled
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 // Insert Schemas
-export const insertUserSchema = createInsertSchema(users);
-export const insertPropertySchema = createInsertSchema(properties);
-export const insertClientSchema = createInsertSchema(clients);
-export const insertAppointmentSchema = createInsertSchema(appointments);
-export const insertSaleSchema = createInsertSchema(sales);
+export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+export const insertPropertySchema = createInsertSchema(properties).omit({ id: true, createdAt: true });
+export const insertClientSchema = createInsertSchema(clients).omit({ id: true, createdAt: true });
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({ id: true, createdAt: true });
+export const insertSaleSchema = createInsertSchema(sales).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
