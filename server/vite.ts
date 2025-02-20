@@ -1,8 +1,8 @@
 import express, { type Express } from "express";
 import fs from "fs";
-import path, { dirname } from "path";
+import path, { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer, createLogger } from "vite";
+import { createLogger } from "vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import { type Server } from "http";
@@ -23,13 +23,27 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  const isProd = process.env.NODE_ENV === "production";
+  if (isProd) {
+    // Serve static files from the client build directory
+    app.use(express.static(resolve(__dirname, "../client/dist")));
+    
+    // Serve index.html for all routes for SPA
+    app.get("*", (req, res) => {
+      res.sendFile(resolve(__dirname, "../client/dist/index.html"));
+    });
+    return;
+  }
+
+  // Development setup
+  const vite = await import("vite");
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: { server, overlay: true },
     allowedHosts: true,
   };
 
-  const vite = await createViteServer({
+  const viteServer = await vite.createServer({
     ...viteConfig,
     configFile: false,
     customLogger: {
@@ -43,7 +57,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
+  app.use(viteServer.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -61,10 +75,10 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
-      const page = await vite.transformIndexHtml(url, template);
+      const page = await viteServer.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
+      viteServer.ssrFixStacktrace(e as Error);
       next(e);
     }
   });

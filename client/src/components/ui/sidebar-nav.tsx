@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Building2,
@@ -15,7 +15,7 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
-  const [location] = useLocation();
+  const location = useLocation();
 
   const items = [
     {
@@ -50,9 +50,13 @@ export function SidebarNav({ className, isCollapsed }: SidebarNavProps) {
       <ScrollArea className="flex-1">
         <div className="space-y-2 py-4">
           {items.map((item) => (
-            <Link key={item.href} href={item.href}>
+            <Link 
+              key={item.href} 
+              to={item.href}
+              className="block w-full"
+            >
               <Button
-                variant={location === item.href ? "secondary" : "ghost"}
+                variant={location.pathname === item.href ? "secondary" : "ghost"}
                 className={cn(
                   "w-full justify-start",
                   isCollapsed && "justify-center"

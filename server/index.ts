@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import fetch from 'node-fetch';
 
 const app = express();
 app.use(express.json());
@@ -34,6 +35,40 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+// Add proxy endpoint for Google Apps Script data
+app.get("/api/properties-data", async (req, res) => {
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbyCCvJqBFvVQ43DcDdQPZdHgRQG2eTjCkA9GQ_WtiILmjPmhzOpvBuARecEP4fE4IUtiw/exec",
+      {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.error("Received non-JSON response:", await response.text());
+      throw new Error("Response was not JSON");
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({ 
+      error: "Failed to fetch properties data", 
+      details: error instanceof Error ? error.message : "Unknown error" 
+    });
+  }
 });
 
 (async () => {
